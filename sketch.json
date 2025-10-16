@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "editor": "vscode",
+  "parts": [
+    { 
+      "type": "board-arduino-mega", 
+      "id": "board" 
+    },
+    {
+      "type": "pushbutton",
+      "id": "roll_button",
+      "top": 0,
+      "left": 100,
+      "attrs": {
+        "color": "green",
+        "label": "ROLL"
+      }
+    },
+    {
+      "type": "i2c-lcd",
+      "id": "lcd1602",
+      "top": 50,
+      "left": 200,
+      "attrs": {
+        "pins": "SCL:21, SDA:20",
+        "cols": 16,
+        "rows": 2
+      }
+    },
+    {
+      "type": "seven-segment-4-digit",
+      "id": "display",
+      "top": 150,
+      "left": 100
+    }
+  ],
+  "connections": [
+    ["roll_button:GND", "board:GND.2"],
+    ["roll_button:VCC", "board:2"],
+    
+    ["lcd1602:VCC", "board:5V"],
+    ["lcd1602:GND", "board:GND.1"],
+    ["lcd1602:SDA", "board:20"],
+    ["lcd1602:SCL", "board:21"],
+
+    ["display:A", "board:3"],
+    ["display:B", "board:4"],
+    ["display:C", "board:5"],
+    ["display:D", "board:6"],
+    ["display:E", "board:7"],
+    ["display:F", "board:8"],
+    ["display:G", "board:9"],
+    ["display:D1", "board:10"],
+    ["display:D2", "board:11"],
+    ["display:D3", "board:12"],
+    ["display:D4", "board:13"]
+  ]
+}
