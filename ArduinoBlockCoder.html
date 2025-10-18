@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arduino Block Coder</title>
+    <!-- Eruda Console -->
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>eruda.init();</script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Blockly library -->
+    <script src="https://unpkg.com/blockly/blockly_compressed.js"></script>
+    <script src="https://unpkg.com/blockly/blocks_compressed.js"></script>
+    <script src="https://unpkg.com/blockly/javascript_compressed.js"></script>
+    <script src="https://unpkg.com/blockly/msg/en.js"></script>
+    <!-- Prism.js for syntax highlighting in the code output -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #2a2a2a;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        /* Three-panel layout */
+        .container {
+            display: flex;
+            height: calc(100vh - 60px);
+            width: 100%;
+        }
+
+        /* Left panel - Blocks toolbox (hidden, integrated in blockly) */
+        #blocklyArea {
+            display: none;
+        }
+
+        /* Middle panel - Workspace */
+        #blocklyDiv {
+            flex: 1;
+            min-width: 0;
+            position: relative;
+        }
+
+        /* Right panel - Code output */
+        #codePanel {
+            flex: 0 0 420px;
+            background: #1e1e1e;
+            border-left: 1px solid #3a3a3a;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .blocklySvg {
+            background-color: #2a2a2a !important;
+        }
+        
+        .blocklyToolboxDiv {
+            background-color: #1e1e1e !important;
+            color: #fff !important;
+        }
+        
+        .blocklyFlyoutBackground {
+            fill: #2a2a2a !important;
+            fill-opacity: 0.95 !important;
+        }
+        
+        .blocklyTreeLabel {
+            color: #e0e0e0 !important;
+        }
+        
+        .blocklyTreeRow {
+            border-bottom: 1px solid #3a3a3a;
+        }
+        
+        .blocklyTreeRow:hover {
+            background-color: #3a3a3a !important;
+        }
+
+        /* Header styles */
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            height: 60px;
+        }
+
+        header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Code panel header */
+        #codePanel h2 {
+            background: #252525;
+            color: #fff;
+            padding: 12px 16px;
+            margin: 0;
+            font-size: 14px;
+            font-weight: 600;
+            border-bottom: 1px solid #404040;
+        }
+
+        /* Code output area */
+        #codeOutput {
+            flex: 1;
+            overflow: auto;
+            margin: 0;
+            padding: 16px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            background: #1e1e1e !important;
+            color: #d4d4d4;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #555;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #777;
+        }
+
+        .blocklyTreeLabel {
+            font-family: 'Inter', sans-serif !important;
+            color: #e0e0e0 !important;
+        }
+
+        .blocklyTreeRow:hover {
+            background-color: #333 !important;
+        }
+
+        .blocklyTreeSelected {
+            background-color: #404040 !important;
+        }
+
+        .blocklyFlyoutBackground {
+            fill: #2d2d2d !important;
+            fill-opacity: 0.95 !important;
+        }
+
+        .blocklyScrollbarBackground {
+            fill: #252525 !important;
+        }
+
+        .blocklyScrollbarHandle {
+            fill: #555 !important;
+        }
+
+        /* Prism syntax highlighting for dark theme */
+        .token.comment { color: #6a9955; }
+        .token.keyword { color: #569cd6; }
+        .token.string { color: #ce9178; }
+        .token.number { color: #b5cea8; }
+        .token.function { color: #dcdcaa; }
+        .token.operator { color: #d4d4d4; }
+        .token.punctuation { color: #d4d4d4; }
+
+        /* Button styles */
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #667eea;
+        }
+
+        .btn-primary:hover {
+            background: #f0f0f0;
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>        /* Empty state message */
+        .empty-code {
+            color: #888;
+            font-style: italic;
+            text-align: center;
+            padding: 40px 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <h1>🔧 Arduino Block Coder</h1>
+        <div>
+            <button class="btn btn-primary" onclick="copyCode()">📋 Copy Code</button>
+        </div>
+    </header>
+
+    <!-- Three-panel layout -->
+    <div class="container">
+        <!-- Left Panel: Block Toolbox (integrated with Blockly) -->
+        <div id="blocklyArea"></div>
+
+        <!-- Middle Panel: Blockly Workspace -->
+        <div id="blocklyDiv"></div>
+
+        <!-- Right Panel: Arduino Code Output -->
+        <div id="codePanel">
+            <h2>Arduino Code</h2>
+            <pre><code id="codeOutput" class="language-c"></code></pre>
+        </div>
+    </div>
+
+    <!-- III. BLOCKLY TOOLBOX DEFINITION -->
+    <xml id="toolbox" style="display: none">
+        <!-- BASIC STRUCTURE -->
+        <category name="⚙️ Structure" colour="#5C7CFA">
+            <block type="arduino_setup_loop"></block>
+            <block type="time_delay">
+                <value name="DELAY_TIME_MILI">
+                    <shadow type="math_number">
+                        <field name="NUM">1000</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="time_millis"></block>
+            <block type="time_micros"></block>
+        </category>
+
+        <!-- DIGITAL I/O -->
+        <category name="📌 Digital I/O" colour="#20C997">
+            <block type="io_pinmode"></block>
+            <block type="io_digitalwrite">
+                 <value name="PIN">
+                    <shadow type="math_number"><field name="NUM">13</field></shadow>
+                </value>
+            </block>
+            <block type="io_digitalread">
+                 <value name="PIN">
+                    <shadow type="math_number"><field name="NUM">2</field></shadow>
+                </value>
+            </block>
+        </category>
+
+        <!-- ANALOG I/O -->
+        <category name="📊 Analog I/O" colour="#FF6B6B">
+            <block type="io_analogwrite">
+                <value name="PIN">
+                    <shadow type="math_number"><field name="NUM">9</field></shadow>
+                </value>
+                <value name="VALUE">
+                    <shadow type="math_number"><field name="NUM">128</field></shadow>
+                </value>
+            </block>
+            <block type="io_analogread">
+                <value name="PIN">
+                     <shadow type="text"><field name="TEXT">A0</field></shadow>
+                </value>
+            </block>
+            <block type="io_map"></block>
+        </category>
+
+        <!-- SERVO -->
+        <category name="🎯 Servo" colour="#4ECDC4">
+             <block type="servo_attach"></block>
+             <block type="servo_write"></block>
+        </category>
+
+        <!-- DISPLAY (LCD) -->
+        <category name="📺 Display (LCD)" colour="#95E1D3">
+            <block type="lcd_setup"></block>
+            <block type="lcd_print"></block>
+            <block type="lcd_setcursor"></block>
+        </category>
+
+        <!-- SERIAL COMMUNICATION -->
+        <category name="💬 Serial" colour="#F38181">
+            <block type="serial_begin"></block>
+            <block type="serial_print">
+                <value name="CONTENT">
+                    <shadow type="text"><field name="TEXT">Hello Arduino</field></shadow>
+                </value>
+            </block>
+        </category>
+
+        <!-- LOGIC & CONTROL -->
+        <category name="🔀 Logic" colour="#FFB6C1">
+            <block type="controls_if"></block>
+            <block type="logic_compare"></block>
+            <block type="logic_operation"></block>
+            <block type="logic_negate"></block>
+            <block type="logic_boolean"></block>
+            <block type="controls_for">
+                <value name="FROM">
+                    <shadow type="math_number"><field name="NUM">1</field></shadow>
+                </value>
+                <value name="TO">
+                    <shadow type="math_number"><field name="NUM">10</field></shadow>
+                </value>
+                <value name="BY">
+                    <shadow type="math_number"><field name="NUM">1</field></shadow>
+                </value>
+            </block>
+            <block type="controls_whileUntil"></block>
+        </category>
+
+        <!-- VARIABLES -->
+        <category name="📦 Variables" colour="#FFA94D" custom="VARIABLE"></category>
+
+        <!-- MATH -->
+        <category name="🔢 Math" colour="#D0BFFF">
+            <block type="math_number"></block>
+            <block type="math_arithmetic"></block>
+            <block type="math_single"></block>
+            <block type="math_trig"></block>
+            <block type="math_constant"></block>
+            <block type="math_random_int"></block>
+            <block type="math_constrain">
+                <value name="VALUE">
+                    <shadow type="math_number"><field name="NUM">50</field></shadow>
+                </value>
+                <value name="LOW">
+                    <shadow type="math_number"><field name="NUM">0</field></shadow>
+                </value>
+                <value name="HIGH">
+                    <shadow type="math_number"><field name="NUM">100</field></shadow>
+                </value>
+            </block>
+        </category>
+
+        <!-- TEXT -->
+        <category name="📝 Text" colour="#FFD43B">
+            <block type="text"></block>
+            <block type="text_join"></block>
+            <block type="text_length"></block>
+        </category>
+    </xml>
+
+    <script>
+    // --- JAVASCRIPT LOGIC ---
+    // Initialize custom C code generator
+    const C = new Blockly.Generator('C');
+    C.ORDER_ATOMIC = 0;
+    C.ORDER_UNARY_POSTFIX = 1;
+    C.ORDER_UNARY_PREFIX = 2;
+    C.ORDER_MULTIPLICATIVE = 3;
+    C.ORDER_ADDITIVE = 4;
+    C.ORDER_SHIFT = 5;
+    C.ORDER_RELATIONAL = 6;
+    C.ORDER_EQUALITY = 7;
+    C.ORDER_BITWISE_AND = 8;
+    C.ORDER_BITWISE_XOR = 9;
+    C.ORDER_BITWISE_OR = 10;
+    C.ORDER_LOGICAL_AND = 11;
+    C.ORDER_LOGICAL_OR = 12;
+    C.ORDER_CONDITIONAL = 13;
+    C.ORDER_ASSIGNMENT = 14;
+    C.ORDER_COMMA = 15;
+    C.ORDER_NONE = 99;
+    C.init = function(workspace) {};
+    C.finish = function(code) { return code; };
+    C.scrub_ = function(block, code, opt_thisOnly) {
+        const nextBlock = block.nextConnection && block.nextConnection.targetBlock();
+        const nextCode = opt_thisOnly ? '' : C.blockToCode(nextBlock);
+        return code + nextCode;
+    };
+
+    // Global sets to manage includes and declarations
+    let requiredIncludes = new Set();
+    let globalDeclarations = new Set();
+    let setupCode = new Set();
+
+    // === 1. Structure & Time ===
+    Blockly.Blocks['arduino_setup_loop'] = {
+      init: function() {
+        this.appendStatementInput("SETUP")
+            .setCheck(null)
+            .appendField("⚙️ void setup()");
+        this.appendStatementInput("LOOP")
+            .setCheck(null)
+            .appendField("🔄 void loop()");
+        this.setColour("#5C7CFA");
+        this.setTooltip("Main Arduino structure: setup runs once, loop repeats forever.");
+        this.setDeletable(false);
+      }
+    };
+    C['arduino_setup_loop'] = function(block) {
+      const setup_branch = C.statementToCode(block, 'SETUP');
+      const loop_branch = C.statementToCode(block, 'LOOP');
+      return `void setup() {\n${setup_branch}}\n\nvoid loop() {\n${loop_branch}}\n`;
+    };
+
+    Blockly.Blocks['time_delay'] = {
+        init: function() {
+            this.appendValueInput("DELAY_TIME_MILI").setCheck("Number").appendField("⏱️ delay");
+            this.appendDummyInput().appendField("ms");
+            this.setInputsInline(true);
+            this.setPreviousStatement(true, null);
+            this.setNextStatement(true, null);
+            this.setColour("#5C7CFA");
+            this.setTooltip("Waits for a specific number of milliseconds.");
+        }
+    };
+    C['time_delay'] = function(block) {
+        const delay_time = C.valueToCode(block, 'DELAY_TIME_MILI', C.ORDER_ATOMIC) || '1000';
+        return `delay(${delay_time});\n`;
+    };
+
+    Blockly.Blocks['time_millis'] = {
+        init: function() {
+            this.appendDummyInput().appendField("millis()");
+            this.setOutput(true, "Number");
+            this.setColour("#5C7CFA");
+            this.setTooltip("Returns the number of milliseconds since the Arduino board began running.");
+        }
+    };
+    C['time_millis'] = function(block) {
+        return ['millis()', C.ORDER_ATOMIC];
+    };
+    
+    Blockly.Blocks['time_micros'] = {
+        init: function() {
+            this.appendDummyInput().appendField("micros()");
+            this.setOutput(true, "Number");
+            this.setColour("#5C7CFA");
+            this.setTooltip("Returns the number of microseconds since the Arduino board began running.");
+        }
+    };
+    C['time_micros'] = function(block) {
+        return ['micros()', C.ORDER_ATOMIC];
+    };
+    // === 2. I/O & Analog ===
+    Blockly.Blocks['io_pinmode'] = {
+      init: function() {
+        this.appendDummyInput()
+            .appendField("pinMode pin")
+            .appendField(new Blockly.FieldNumber(13, 0, 53), "PIN")
+            .appendField("to")
+            .appendField(new Blockly.FieldDropdown([["OUTPUT","OUTPUT"], ["INPUT","INPUT"], ["INPUT_PULLUP","INPUT_PULLUP"]]), "MODE");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour("#20C997");
+        this.setTooltip("Configures the specified pin to behave either as an input or an output.");
+      }
+    };
+    C['io_pinmode'] = function(block) {
+        const pin = block.getFieldValue('PIN');
+        const mode = block.getFieldValue('MODE');
+        return `pinMode(${pin}, ${mode});\n`;
+    };
+    
+    Blockly.Blocks['io_digitalwrite'] = {
+        init: function() {
+            this.appendValueInput("PIN").setCheck("Number").appendField("digitalWrite pin");
+            this.appendDummyInput()
+                .appendField("to")
+                .appendField(new Blockly.FieldDropdown([["HIGH","HIGH"], ["LOW","LOW"]]), "STATE");
+            this.setInputsInline(true);
+            this.setPreviousStatement(true, null);
+            this.setNextStatement(true, null);
+            this.setColour("#20C997");
+            this.setTooltip("Write a HIGH or LOW value to a digital pin.");
+        }
+    };
+    C['io_digitalwrite'] = function(block) {
+        const pin = C.valueToCode(block, 'PIN', C.ORDER_ATOMIC) || '13';
+        const state = block.getFieldValue('STATE');
+        return `digitalWrite(${pin}, ${state});\n`;
+    };
+
+    Blockly.Blocks['io_digitalread'] = {
+        init: function() {
+            this.appendValueInput("PIN").setCheck("Number").appendField("digitalRead pin");
+            this.setOutput(true, "Boolean");
+            this.setColour("#20C997");
+            this.setTooltip("Reads the value from a specified digital pin, either HIGH or LOW.");
+        }
+    };
+    C['io_digitalread'] = function(block) {
+        const pin = C.valueToCode(block, 'PIN', C.ORDER_ATOMIC) || '2';
+        return [`digitalRead(${pin})`, C.ORDER_ATOMIC];
+    };
+    
+    Blockly.Blocks['io_analogwrite'] = {
+        init: function() {
+            this.appendValueInput("PIN").setCheck("Number").appendField("analogWrite (PWM) pin");
+            this.appendValueInput("VALUE").setCheck("Number").appendField("value");
+            this.setInputsInline(true);
+            this.setPreviousStatement(true, null);
+            this.setNextStatement(true, null);
+            this.setColour("#FF6B6B");
+            this.setTooltip("Writes an analog value (PWM wave) to a pin. Value 0-255.");
+        }
+    };
+    C['io_analogwrite'] = function(block) {
+        const pin = C.valueToCode(block, 'PIN', C.ORDER_ATOMIC) || '9';
+        const value = C.valueToCode(block, 'VALUE', C.ORDER_ATOMIC) || '0';
+        return `analogWrite(${pin}, ${value});\n`;
+    };
+
+    Blockly.Blocks['io_analogread'] = {
+        init: function() {
+            this.appendValueInput("PIN").appendField("analogRead pin");
+            this.setOutput(true, "Number");
+            this.setColour("#FF6B6B");
+            this.setTooltip("Reads the value from the specified analog pin. Returns 0-1023.");
+        }
+    };
+    C['io_analogread'] = function(block) {
+        const pin = C.valueToCode(block, 'PIN', C.ORDER_ATOMIC) || 'A0';
+        return [`analogRead(${pin})`, C.ORDER_ATOMIC];
+    };
+
+    Blockly.Blocks['io_map'] = {
+        init: function() {
+            this.appendValueInput("VALUE").setCheck("Number").appendField("map value");
+            this.appendValueInput("FROMLOW").setCheck("Number").appendField("from low");
+            this.appendValueInput("FROMHIGH").setCheck("Number").appendField("high");
+            this.appendValueInput("TOLOW").setCheck("Number").appendField("to low");
+            this.appendValueInput("TOHIGH").setCheck("Number").appendField("high");
+            this.setOutput(true, "Number");
+            this.setColour("#FF6B6B");
+            this.setTooltip("Re-maps a number from one range to another.");
+        }
+    };
+    C['io_map'] = function(block) {
+        const value = C.valueToCode(block, 'VALUE', C.ORDER_ATOMIC) || '0';
+        const fromLow = C.valueToCode(block, 'FROMLOW', C.ORDER_ATOMIC) || '0';
+        const fromHigh = C.valueToCode(block, 'FROMHIGH', C.ORDER_ATOMIC) || '1023';
+        const toLow = C.valueToCode(block, 'TOLOW', C.ORDER_ATOMIC) || '0';
+        const toHigh = C.valueToCode(block, 'TOHIGH', C.ORDER_ATOMIC) || '255';
+        const code = `map(${value}, ${fromLow}, ${fromHigh}, ${toLow}, ${toHigh})`;
+        return [code, C.ORDER_ATOMIC];
+    };
+
+    // === 3. Serial Communication ===
+    Blockly.Blocks['serial_begin'] = {
+        init: function() {
+            this.appendDummyInput()
+                .appendField("Serial.begin baudrate:")
+                .appendField(new Blockly.FieldDropdown([
+                    ["9600", "9600"], 
+                    ["115200", "115200"],
+                    ["57600", "57600"], 
+                    ["38400", "38400"],
+                    ["19200", "19200"]
+                ]), "BAUDRATE");
+            this.setPreviousStatement(true, null);
+            this.setNextStatement(true, null);
+            this.setColour("#F38181");
+            this.setTooltip("Sets the data rate in bits per second (baud) for serial data transmission.");
+        }
+    };
+    C['serial_begin'] = function(block) {
+        const baudrate = block.getFieldValue('BAUDRATE');
+        return `Serial.begin(${baudrate});\n`;
+    };
+    
+    Blockly.Blocks['serial_print'] = {
+        init: function() {
+            this.appendValueInput("CONTENT")
+                .appendField(new Blockly.FieldDropdown([
+                    ["Serial.print", "print"], 
+                    ["Serial.println", "println"]
+                ]), "TYPE");
+            this.setPreviousStatement(true, null);
+            this.setNextStatement(true, null);
+            this.setColour("#F38181");
+            this.setTooltip("Prints data to the serial port.");
+        }
+    };
+    C['serial_print'] = function(block) {
+        const type = block.getFieldValue('TYPE');
+        const content = C.valueToCode(block, 'CONTENT', C.ORDER_ATOMIC) || '""';
+        return `Serial.${type}(${content});\n`;
+    };
+
+    // === 4. Servo ===
+    Blockly.Blocks['servo_attach'] = {
+      init: function() {
+        this.appendDummyInput()
+            .appendField("🎯 Setup Servo")
+            .appendField(new Blockly.FieldVariable("myServo"), "SERVO_NAME")
+            .appendField("on pin")
+            .appendField(new Blockly.FieldNumber(9, 0, 53), "PIN");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour("#4ECDC4");
+        this.setTooltip("Attaches a servo object to a pin.");
+      }
+    };
+    C['servo_attach'] = function(block) {
+        requiredIncludes.add('#include <Servo.h>');
+        const servoName = Blockly.Variables.nameDB_.getName(block.getFieldValue('SERVO_NAME'), Blockly.Variables.CATEGORY_NAME);
+        globalDeclarations.add(`Servo ${servoName};`);
+        const pin = block.getFieldValue('PIN');
+        return `${servoName}.attach(${pin});\n`;
+    };
+    
+    Blockly.Blocks['servo_write'] = {
+      init: function() {
+        this.appendValueInput("ANGLE")
+            .setCheck("Number")
+            .appendField("Set servo")
+            .appendField(new Blockly.FieldVariable("myServo"), "SERVO_NAME")
+            .appendField("to angle");
+        this.appendDummyInput().appendField("°");
+        this.setInputsInline(true);
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour("#4ECDC4");
+        this.setTooltip("Writes a value to the servo, controlling the shaft accordingly. (0-180°)");
+      }
+    };
+    C['servo_write'] = function(block) {
+        const servoName = Blockly.Variables.nameDB_.getName(block.getFieldValue('SERVO_NAME'), Blockly.Variables.CATEGORY_NAME);
+        const angle = C.valueToCode(block, 'ANGLE', C.ORDER_ATOMIC) || '90';
+        return `${servoName}.write(${angle});\n`;
+    };
+    // === 5. Display (LCD) ===
+    Blockly.Blocks['lcd_setup'] = {
+      init: function() {
+        this.appendDummyInput().appendField("📺 Setup LCD 16x2");
+        this.appendValueInput("RS").setCheck("Number").appendField("RS pin");
+        this.appendValueInput("EN").setCheck("Number").appendField("EN pin");
+        this.appendValueInput("D4").setCheck("Number").appendField("D4 pin");
+        this.appendValueInput("D5").setCheck("Number").appendField("D5 pin");
+        this.appendValueInput("D6").setCheck("Number").appendField("D6 pin");
+        this.appendValueInput("D7").setCheck("Number").appendField("D7 pin");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour("#95E1D3");
+      }
+    };
+    C['lcd_setup'] = function(block) {
+        requiredIncludes.add('#include <LiquidCrystal.h>');
+        const rs = C.valueToCode(block, 'RS', C.ORDER_ATOMIC) || '12';
+        const en = C.valueToCode(block, 'EN', C.ORDER_ATOMIC) || '11';
+        const d4 = C.valueToCode(block, 'D4', C.ORDER_ATOMIC) || '5';
+        const d5 = C.valueToCode(block, 'D5', C.ORDER_ATOMIC) || '4';
+        const d6 = C.valueToCode(block, 'D6', C.ORDER_ATOMIC) || '3';
+        const d7 = C.valueToCode(block, 'D7', C.ORDER_ATOMIC) || '2';
+        globalDeclarations.add(`LiquidCrystal lcd(${rs}, ${en}, ${d4}, ${d5}, ${d6}, ${d7});`);
+        setupCode.add('lcd.begin(16, 2);');
+        return '';
+    };
+
+    Blockly.Blocks['lcd_print'] = {
+      init: function() {
+        this.appendValueInput("TEXT").setCheck(["String", "Number"]).appendField("LCD print");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour("#95E1D3");
+      }
+    };
+    C['lcd_print'] = function(block) {
+      const text = C.valueToCode(block, 'TEXT', C.ORDER_ATOMIC) || '""';
+      return `lcd.print(${text});\n`;
+    };
+    
+    Blockly.Blocks['lcd_setcursor'] = {
+      init: function() {
+        this.appendValueInput("COL").setCheck("Number").appendField("LCD set cursor col");
+        this.appendValueInput("ROW").setCheck("Number").appendField("row");
+        this.setInputsInline(true);
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour("#95E1D3");
+      }
+    };
+    C['lcd_setcursor'] = function(block) {
+      const col = C.valueToCode(block, 'COL', C.ORDER_ATOMIC) || '0';
+      const row = C.valueToCode(block, 'ROW', C.ORDER_ATOMIC) || '0';
+      return `lcd.setCursor(${col}, ${row});\n`;
+    };
+
+    // --- WORKSPACE INITIALIZATION & CODE GENERATION ---
+    const blocklyDiv = document.getElementById('blocklyDiv');
+    const toolbox = document.getElementById('toolbox');
+    const codeOutput = document.getElementById('codeOutput');
+
+    // Inject Blockly workspace with dark theme colors
+    const workspace = Blockly.inject(blocklyDiv, {
+        toolbox: toolbox,
+        grid: {
+            spacing: 20,
+            length: 3,
+            colour: '#3a3a3a',
+            snap: true
+        },
+        zoom: {
+            controls: true,
+            wheel: true,
+            startScale: 0.9,
+            maxScale: 3,
+            minScale: 0.3,
+            scaleSpeed: 1.2
+        },
+        trashcan: true,
+        sounds: false,
+        scrollbars: true,
+        move: {
+            scrollbars: {
+                horizontal: true,
+                vertical: true
+            },
+            drag: true,
+            wheel: true
+        }
+    });
+
+    // Function to generate and display the code
+    function generateCode() {
+        try {
+            // Clear previous session's globals
+            requiredIncludes.clear();
+            globalDeclarations.clear();
+            setupCode.clear();
+
+            // Generate code (this populates the global sets)
+            C.workspaceToCode(workspace);
+
+            // Extract code from the main setup/loop block
+            let setupBranch = '';
+            let loopBranch = '';
+            const topBlocks = workspace.getTopBlocks(true);
+            const setupBlock = topBlocks.find(block => block.type === 'arduino_setup_loop');
+            
+            if (setupBlock) {
+                // Add setup code from other blocks (like LCD)
+                const setupCodeArray = Array.from(setupCode);
+                const setupStatements = C.statementToCode(setupBlock, 'SETUP');
+                
+                // Properly format setup branch
+                if (setupCodeArray.length > 0 || setupStatements.trim()) {
+                    setupBranch = (setupCodeArray.length > 0 ? setupCodeArray.join('\n  ') + '\n  ' : '') + setupStatements;
+                }
+                
+                loopBranch = C.statementToCode(setupBlock, 'LOOP');
+            } else {
+                codeOutput.textContent = "// 🚀 Drag the '⚙️ void setup() / 🔄 void loop()' block from Structure category to start!\n// 💡 Add blocks inside setup and loop to generate Arduino code.";
+                return;
+            }
+            
+            // Assemble final code with proper formatting
+            const includes = Array.from(requiredIncludes).join('\n');
+            const globals = Array.from(globalDeclarations).join('\n');
+            
+            let finalCode = "";
+            
+            // Add comment header
+            finalCode += "// Generated Arduino Code\n";
+            finalCode += "// Created with Arduino Block Coder\n\n";
+            
+            // Add includes
+            if (includes) {
+                finalCode += includes + '\n\n';
+            }
+            
+            // Add global declarations
+            if (globals) {
+                finalCode += globals + '\n\n';
+            }
+
+            // Add setup function
+            finalCode += `void setup() {\n`;
+            if (setupBranch.trim()) {
+                finalCode += `  ${setupBranch.trim().replace(/\n/g, '\n  ')}\n`;
+            } else {
+                finalCode += `  // Setup code goes here\n`;
+            }
+            finalCode += `}\n\n`;
+            
+            // Add loop function
+            finalCode += `void loop() {\n`;
+            if (loopBranch.trim()) {
+                finalCode += `  ${loopBranch.trim().replace(/\n/g, '\n  ')}\n`;
+            } else {
+                finalCode += `  // Main code goes here\n`;
+            }
+            finalCode += `}\n`;
+
+            codeOutput.textContent = finalCode;
+            
+            // Apply syntax highlighting
+            if (typeof Prism !== 'undefined') {
+                Prism.highlightElement(codeOutput);
+            }
+        } catch (error) {
+            console.error('Code generation error:', error);
+            codeOutput.textContent = `// Error generating code:\n// ${error.message}\n// Check console for details.`;
+        }
+    }
+
+    // Copy code function
+    function copyCode() {
+        const code = codeOutput.textContent;
+        navigator.clipboard.writeText(code).then(() => {
+            alert('Code copied to clipboard!');
+        }).catch(err => {
+            console.error('Failed to copy code:', err);
+        });
+    }
+
+    // Add listener to update code in real-time
+    workspace.addChangeListener((event) => {
+        if (event.type == Blockly.Events.BLOCK_MOVE || 
+            event.type == Blockly.Events.BLOCK_CHANGE ||
+            event.type == Blockly.Events.BLOCK_DELETE ||
+            event.type == Blockly.Events.BLOCK_CREATE ||
+            event.type == Blockly.Events.VAR_CREATE ||
+            event.type == Blockly.Events.VAR_RENAME) {
+            generateCode();
+        }
+    });
+    
+    // Load initial state with the main block
+    const xml_text = '<xml xmlns="https://developers.google.com/blockly/xml"><block type="arduino_setup_loop" deletable="false" x="50" y="50"></block></xml>';
+    const xml = Blockly.Xml.textToDom(xml_text);
+    Blockly.Xml.domToWorkspace(xml, workspace);
+
+    // Initial code generation
+    generateCode();
+
+    // Handle workspace resizing
+    const onresize = function() {
+        Blockly.svgResize(workspace);
+    };
+    window.addEventListener('resize', onresize, false);
+    onresize();
+
+    </script>
+</body>
+</html>

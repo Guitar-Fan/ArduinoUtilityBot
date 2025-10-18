@@ -1,6 +1,6 @@
 #include <LiquidCrystal_I2C.h>
 #include <Wire.h>
-#include <Servo.h>
+#include <LedControl.h>
 
 // Ultrasonic Sensor Pins (Using Analog pins as digital for convenience)
 const int TRIG_PIN = A0;
