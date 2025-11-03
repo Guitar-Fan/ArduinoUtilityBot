@@ -1,207 +1,170 @@
-#include <Wire.h>
-#include <LiquidCrystal_I2C.h>
-#include <LedControl.h>
+#include <MaxMatrix.h>
 
-// --- Configuration ---
+PROGMEM const unsigned char CH[] = {
+3, 8, B00000000, B00000000, B00000000, B00000000, B00000000, // space
+1, 8, B01011111, B00000000, B00000000, B00000000, B00000000, // !
+3, 8, B00000011, B00000000, B00000011, B00000000, B00000000, // "
+5, 8, B00010100, B00111110, B00010100, B00111110, B00010100, // #
+4, 8, B00100100, B01101010, B00101011, B00010010, B00000000, // $
+5, 8, B01100011, B00010011, B00001000, B01100100, B01100011, // %
+5, 8, B00110110, B01001001, B01010110, B00100000, B01010000, // &
+1, 8, B00000011, B00000000, B00000000, B00000000, B00000000, // '
+3, 8, B00011100, B00100010, B01000001, B00000000, B00000000, // (
+3, 8, B01000001, B00100010, B00011100, B00000000, B00000000, // )
+5, 8, B00101000, B00011000, B00001110, B00011000, B00101000, // *
+5, 8, B00001000, B00001000, B00111110, B00001000, B00001000, // +
+2, 8, B10110000, B01110000, B00000000, B00000000, B00000000, // ,
+4, 8, B00001000, B00001000, B00001000, B00001000, B00000000, // -
+2, 8, B01100000, B01100000, B00000000, B00000000, B00000000, // .
+4, 8, B01100000, B00011000, B00000110, B00000001, B00000000, // /
+4, 8, B00111110, B01000001, B01000001, B00111110, B00000000, // 0
+3, 8, B01000010, B01111111, B01000000, B00000000, B00000000, // 1
+4, 8, B01100010, B01010001, B01001001, B01000110, B00000000, // 2
+4, 8, B00100010, B01000001, B01001001, B00110110, B00000000, // 3
+4, 8, B00011000, B00010100, B00010010, B01111111, B00000000, // 4
+4, 8, B00100111, B01000101, B01000101, B00111001, B00000000, // 5
+4, 8, B00111110, B01001001, B01001001, B00110000, B00000000, // 6
+4, 8, B01100001, B00010001, B00001001, B00000111, B00000000, // 7
+4, 8, B00110110, B01001001, B01001001, B00110110, B00000000, // 8
+4, 8, B00000110, B01001001, B01001001, B00111110, B00000000, // 9
+2, 8, B01010000, B00000000, B00000000, B00000000, B00000000, // :
+2, 8, B10000000, B01010000, B00000000, B00000000, B00000000, // ;
+3, 8, B00010000, B00101000, B01000100, B00000000, B00000000, // <
+3, 8, B00010100, B00010100, B00010100, B00000000, B00000000, // =
+3, 8, B01000100, B00101000, B00010000, B00000000, B00000000, // >
+4, 8, B00000010, B01011001, B00001001, B00000110, B00000000, // ?
+5, 8, B00111110, B01001001, B01010101, B01011101, B00001110, // @
+4, 8, B01111110, B00010001, B00010001, B01111110, B00000000, // A
+4, 8, B01111111, B01001001, B01001001, B00110110, B00000000, // B
+4, 8, B00111110, B01000001, B01000001, B00100010, B00000000, // C
+4, 8, B01111111, B01000001, B01000001, B00111110, B00000000, // D
+4, 8, B01111111, B01001001, B01001001, B01000001, B00000000, // E
+4, 8, B01111111, B00001001, B00001001, B00000001, B00000000, // F
+4, 8, B00111110, B01000001, B01001001, B01111010, B00000000, // G
+4, 8, B01111111, B00001000, B00001000, B01111111, B00000000, // H
+3, 8, B01000001, B01111111, B01000001, B00000000, B00000000, // I
+4, 8, B00110000, B01000000, B01000001, B00111111, B00000000, // J
+4, 8, B01111111, B00001000, B00010100, B01100011, B00000000, // K
+4, 8, B01111111, B01000000, B01000000, B01000000, B00000000, // L
+5, 8, B01111111, B00000010, B00001100, B00000010, B01111111, // M
+5, 8, B01111111, B00000100, B00001000, B00010000, B01111111, // N
+4, 8, B00111110, B01000001, B01000001, B00111110, B00000000, // O
+4, 8, B01111111, B00001001, B00001001, B00000110, B00000000, // P
+4, 8, B00111110, B01000001, B01000001, B10111110, B00000000, // Q
+4, 8, B01111111, B00001001, B00001001, B01110110, B00000000, // R
+4, 8, B01000110, B01001001, B01001001, B00110010, B00000000, // S
+5, 8, B00000001, B00000001, B01111111, B00000001, B00000001, // T
+4, 8, B00111111, B01000000, B01000000, B00111111, B00000000, // U
+5, 8, B00001111, B00110000, B01000000, B00110000, B00001111, // V
+5, 8, B00111111, B01000000, B00111000, B01000000, B00111111, // W
+5, 8, B01100011, B00010100, B00001000, B00010100, B01100011, // X
+5, 8, B00000111, B00001000, B01110000, B00001000, B00000111, // Y
+4, 8, B01100001, B01010001, B01001001, B01000111, B00000000, // Z
+2, 8, B01111111, B01000001, B00000000, B00000000, B00000000, // [
+4, 8, B00000001, B00000110, B00011000, B01100000, B00000000, // \
+2, 8, B01000001, B01111111, B00000000, B00000000, B00000000, // ]
+3, 8, B00000010, B00000001, B00000010, B00000000, B00000000, // hat
+4, 8, B01000000, B01000000, B01000000, B01000000, B00000000, // _
+2, 8, B00000001, B00000010, B00000000, B00000000, B00000000, // `
+4, 8, B00100000, B01010100, B01010100, B01111000, B00000000, // a
+4, 8, B01111111, B01000100, B01000100, B00111000, B00000000, // b
+4, 8, B00111000, B01000100, B01000100, B00101000, B00000000, // c
+4, 8, B00111000, B01000100, B01000100, B01111111, B00000000, // d
+4, 8, B00111000, B01010100, B01010100, B00011000, B00000000, // e
+3, 8, B00000100, B01111110, B00000101, B00000000, B00000000, // f
+4, 8, B10011000, B10100100, B10100100, B01111000, B00000000, // g
+4, 8, B01111111, B00000100, B00000100, B01111000, B00000000, // h
+3, 8, B01000100, B01111101, B01000000, B00000000, B00000000, // i
+4, 8, B01000000, B10000000, B10000100, B01111101, B00000000, // j
+4, 8, B01111111, B00010000, B00101000, B01000100, B00000000, // k
+3, 8, B01000001, B01111111, B01000000, B00000000, B00000000, // l
+5, 8, B01111100, B00000100, B01111100, B00000100, B01111000, // m
+4, 8, B01111100, B00000100, B00000100, B01111000, B00000000, // n
+4, 8, B00111000, B01000100, B01000100, B00111000, B00000000, // o
+4, 8, B11111100, B00100100, B00100100, B00011000, B00000000, // p
+4, 8, B00011000, B00100100, B00100100, B11111100, B00000000, // q
+4, 8, B01111100, B00001000, B00000100, B00000100, B00000000, // r
+4, 8, B01001000, B01010100, B01010100, B00100100, B00000000, // s
+3, 8, B00000100, B00111111, B01000100, B00000000, B00000000, // t
+4, 8, B00111100, B01000000, B01000000, B01111100, B00000000, // u
+5, 8, B00011100, B00100000, B01000000, B00100000, B00011100, // v
+5, 8, B00111100, B01000000, B00111100, B01000000, B00111100, // w
+5, 8, B01000100, B00101000, B00010000, B00101000, B01000100, // x
+4, 8, B10011100, B10100000, B10100000, B01111100, B00000000, // y
+3, 8, B01100100, B01010100, B01001100, B00000000, B00000000, // z
+3, 8, B00001000, B00110110, B01000001, B00000000, B00000000, // {
+1, 8, B01111111, B00000000, B00000000, B00000000, B00000000, // |
+3, 8, B01000001, B00110110, B00001000, B00000000, B00000000, // }
+4, 8, B00001000, B00000100, B00001000, B00000100, B00000000, // ~
+};
 
-// Ultrasonic Sensor Pins (as seen in the Wokwi diagram)
-const int TRIG_PIN = 10;
-const int ECHO_PIN = 9;
+int data = 8;
+int load = 9;
+int clock = 10;
 
-// LED Pins
-const int RED_LED_PIN = 6;
-const int YELLOW_LED_PIN = 7;
-const int GREEN_LED_PIN = 8;
+int maxInUse = 1;
+MaxMatrix m(data, load, clock, maxInUse);
+byte buffer[10];
 
-// LCD I2C Address
-const int LCD_ADDR = 0x27;
-
-// LED Matrix Pins (MAX7219)
-const int MATRIX_DIN_PIN = 5;  // Data In
-const int MATRIX_CS_PIN = 4;   // Chip Select
-const int MATRIX_CLK_PIN = 3;  // Clock
-
-// --- Game Settings ---
-const int MIN_CONTROL_DIST = 5;   // Closest distance for control (cm)
-const int MAX_CONTROL_DIST = 40;  // Farthest distance for control (cm)
-const int OBSTACLE_HEIGHT = 4;    // Height of the obstacle in pixels
-
-// --- Global Objects ---
-LiquidCrystal_I2C lcd(LCD_ADDR, 16, 2);
-LedControl lc = LedControl(MATRIX_DIN_PIN, MATRIX_CLK_PIN, MATRIX_CS_PIN, 1);
-
-// --- Game State Variables ---
-int score = 0;
-int playerRow = 3;      // Player's vertical position (0-7)
-int obstacleCol = 7;    // Obstacle's horizontal position (0-7)
-int obstacleGapRow = 2; // Top row of the obstacle's gap
-bool isGameOver = false;
-
-unsigned long lastMoveTime = 0;
-int moveInterval = 400; // Initial speed (ms per column)
-
-// --- Main Program ---
-
+char string1[] = " Arduino Project YSWS . . .";
 void setup() {
-  // Initialize LCD
-  lcd.init();
-  lcd.backlight();
-
-  // Initialize LED Matrix
-  lc.shutdown(0, false);      // Wake up the display
-  lc.setIntensity(0, 8);      // Set brightness (0-15)
-  lc.clearDisplay(0);
-
-  // Set pin modes
-  pinMode(TRIG_PIN, OUTPUT);
-  pinMode(ECHO_PIN, INPUT);
-  pinMode(RED_LED_PIN, OUTPUT);
-  pinMode(YELLOW_LED_PIN, OUTPUT);
-  pinMode(GREEN_LED_PIN, OUTPUT);
-
-  // Seed the random number generator
-  randomSeed(analogRead(A2)); // Use an unconnected pin for a random seed
-
-  resetGame();
+m.init(); // Start module
+m.setIntensity(0);
+Serial.begin(9600); // Start serial communication
 }
 
 void loop() {
-  if (isGameOver) {
-    // If the game is over, check for a reset condition
-    // A hand very close to the sensor will restart the game
-    if (measureDistanceCM() < 5 && measureDistanceCM() > 0) {
-      resetGame();
-    }
-    return; // Stop the game loop
-  }
-
-  // --- Game Running ---
-  handlePlayerInput();
-  updateGameLogic();
-  drawGame();
+byte c;
+while (Serial.available() > 0) {
+byte c = Serial.read();
+Serial.println(c, DEC);
+printCharWithShift(c, 100);
+}
+delay(100);
+m.shiftLeft(false, true);
+printStringWithShift(string1, 100);
 }
 
-
-// --- Helper Functions ---
-
-/**
- * @brief Resets the game to its starting state.
- */
-void resetGame() {
-  isGameOver = false;
-  score = 0;
-  playerRow = 3;
-  obstacleCol = 7;
-  moveInterval = 400;
-  
-  // Generate the first obstacle
-  obstacleGapRow = random(0, 8 - OBSTACLE_HEIGHT);
-
-  // Update displays and LEDs for a new game
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("Matrix Mover!");
-  lcd.setCursor(0, 1);
-  lcd.print("Score: 0");
-
-  digitalWrite(GREEN_LED_PIN, HIGH);
-  digitalWrite(RED_LED_PIN, LOW);
-  digitalWrite(YELLOW_LED_PIN, LOW);
-  delay(1000);
+void printCharWithShift(char c, int shift_speed) {
+if (c < 32) return;
+c -= 32;
+memcpy_P(buffer, CH + 7 * c, 7);
+m.writeSprite(maxInUse * 8, 0, buffer);
+m.setColumn(maxInUse * 8 + buffer[0], 0);
+for (int i = 0; i < buffer[0] + 1; i++) {
+delay(shift_speed);
+m.shiftLeft(false, false);
+}
 }
 
-
-/**
- * @brief Reads sensor and updates the player's position.
- */
-void handlePlayerInput() {
-  long distance = measureDistanceCM();
-  // Map the hand distance to a row on the matrix (0-7)
-  // Note: 7, 0 is inverted because closer distance = lower row number (top)
-  playerRow = map(distance, MIN_CONTROL_DIST, MAX_CONTROL_DIST, 7, 0);
-  // Keep the player within the screen bounds
-  playerRow = constrain(playerRow, 0, 7);
+void printCharWithShift(char c, int shift_speed) {
+if (c < 32) return;
+c -= 32;
+memcpy_P(buffer, CH + 7 * c, 7);
+m.writeSprite(maxInUse * 8, 0, buffer);
+m.setColumn(maxInUse * 8 + buffer[0], 0);
+for (int i = 0; i < buffer[0] + 1; i++) {
+delay(shift_speed);
+m.shiftLeft(false, false);
+}
 }
 
-
-/**
- * @brief Moves obstacles, checks for collisions, and updates the score.
- */
-void updateGameLogic() {
-  // Move the obstacle at a speed determined by moveInterval
-  if (millis() - lastMoveTime > moveInterval) {
-    lastMoveTime = millis();
-    obstacleCol--; // Move obstacle one step to the left
-
-    // Check for collision
-    if (obstacleCol == 0) { // Player's column
-      bool passed = (playerRow >= obstacleGapRow && playerRow < obstacleGapRow + OBSTACLE_HEIGHT);
-      if (!passed) {
-        // Collision detected!
-        isGameOver = true;
-        digitalWrite(GREEN_LED_PIN, LOW);
-        digitalWrite(RED_LED_PIN, HIGH);
-        lcd.clear();
-        lcd.setCursor(0, 0);
-        lcd.print("Game Over!");
-        lcd.setCursor(0, 1);
-        lcd.print("Score: " + String(score));
-        return;
-      }
-    }
-    
-    // Check if obstacle has passed the player
-    if (obstacleCol < 0) {
-      score++;
-      obstacleCol = 7; // Reset obstacle to the right side
-      obstacleGapRow = random(0, 8 - OBSTACLE_HEIGHT); // New random gap
-      
-      // Increase speed slightly every 3 points
-      if (score > 0 && score % 3 == 0 && moveInterval > 150) {
-          moveInterval -= 25;
-      }
-      
-      // Update score on LCD
-      lcd.setCursor(0, 1);
-      lcd.print("Score: " + String(score) + "   ");
-      
-      // Flash yellow LED for success
-      digitalWrite(YELLOW_LED_PIN, HIGH);
-      delay(100);
-      digitalWrite(YELLOW_LED_PIN, LOW);
-    }
-  }
+void printStringWithShift(char* s, int shift_speed) {
+while (*s != 0) {
+printCharWithShift(*s, shift_speed);
+s++;
+}
 }
 
-/**
- * @brief Clears and redraws the player and obstacles on the LED matrix.
- */
-void drawGame() {
-  lc.clearDisplay(0);
-
-  // Draw the player
-  lc.setLed(0, 0, playerRow, true);
-
-  // Draw the obstacle (two parts: top and bottom)
-  for (int r = 0; r < 8; r++) {
-    // If the row 'r' is NOT in the gap, draw part of the obstacle
-    if (!(r >= obstacleGapRow && r < obstacleGapRow + OBSTACLE_HEIGHT)) {
-      lc.setLed(0, obstacleCol, r, true);
-    }
-  }
+void printString(char* s) {
+int col = 0;
+while (*s != 0) {
+if (*s < 32) continue;
+char c = *s - 32;
+memcpy_P(buffer, CH + 7 * c, 7);
+m.writeSprite(col, 0, buffer);
+m.setColumn(col + buffer[0], 0);
+col += buffer[0] + 1;
+s++;
 }
-
-/**
- * @brief Measures distance in centimeters.
- * @return Distance in cm, or -1 if out of range.
- */
-long measureDistanceCM() {
-  digitalWrite(TRIG_PIN, LOW);
-  delayMicroseconds(2);
-  digitalWrite(TRIG_PIN, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(TRIG_PIN, LOW);
-  long duration = pulseIn(ECHO_PIN, HIGH, 25000); // 25ms timeout
-  long distance = duration * 0.0343 / 2;
-  return (distance > 0 && distance < 400) ? distance : -1;
 }
