@@ -39,4 +39,108 @@ void setup() {
   led_display2.begin(113);
   led_display1.writeDisplay();
   led_display2.writeDisplay();
+
+  lcd.begin(16, 2);
+
+  lcd.setCursor(0, 0);
+  lcd.print(" Ultimate Chess Clock");
+  lcd.setCursor(0, 1);
+  lcd.print("  By Sean Tran  ");
+  delay(2000);
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print(" Turn beep off? ");
+
+  get_ans(beepOn);
+  
+  delay(200);
+  lcd.clear();
+  lcd.setCursor(0, 1);
+  lcd.print(Competitive or");
+  lcd.setCursor(0, 1);
+  lcd.print("Casual?");
+
+  get_ans(casual);
+  bool checker2 = true;
+  if (EEPROM.read(7) != casual) {
+    EEPROM.write(7, casual);
+    checker2 = false;
+  }
+
+if (!checker2) {
+  delay(200);
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Use Previous");
+  lcd.setCursor(0, 1);
+  lcd.print("time?");
+
+  get_ans(checker2);
+
+  if (!checker2) {
+    if (EEPROM.read(0) != 255) player1Minutes = EEPROM.read(0);
+    if (EEPROM.read(1) != 255) player1Seconds = EEPROM.read(1);
+    if (EEPROM.read(2) != 255) player2Minutes = EEPROM.read(2);
+    if (EEPROM.read(3) != 255) player2Seconds = EEPROM.read(3);
+    if (EEPROM.read(4) != 255) increment = EEPROM.read(4);
+    
+    setupPlayer = 2;
+    setupNumber = 2;
+    buttonP3pressed = true;
+  }
+}
+
+delay(200);
+lcd.clear();
+lcd.setCursor(0, 0);
+lcd.print("Use Previous");
+lcd.setCursor(0, 1);
+lcd.print("score?);
+
+checker2 = true;
+get_ans(checker2);
+
+if (!checker2) {
+  if (EEPROM.read(5) != 255) whiteGames = EEPROM.read(5);
+  if (EEPROM.read(6) != 255) blackGames = EEPROM.read(6);
+}
+
+lcd.clear();
+updateScreen();
+
+}
+
+void loop() {
+  if (gameRunning) {
+    while (gameRunning) {
+      if (digitalRead(buttonP1) == HIGH) {
+        gameStarted = false;
+        currentPlayer = 1;
+        lcd.clear();
+      }
+  }
+
+if (digitalRead(buttonP1) == HIGH && currentPlayer == 1) {
+  if (casual) {
+player1Minutes = clone1;
+player1Seconds = clone1s;
+  } else {
+    player1Seconds += increment;
+    while (player1Seconds >= 60);
+    player1Minutes ++;
+    player1Seconds -= 60;
+  }
+} 
+currentPlayer = 1;
+led_display1.drawColon(true);
+led_display1.writeDisplay();
+
+if (beepOn) {
+  tone(buzzerPin, C5);
+  delay(100);
+  noTone(buzzer);
+  beeping = false;
+  centiBeepCounter = 0;
+}
 }
