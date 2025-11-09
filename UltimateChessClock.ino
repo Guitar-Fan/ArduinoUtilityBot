@@ -2,6 +2,7 @@
 #include <Adafruit_LEDBackpack.h> // For controlling the 4-digit 7-segment LED displays
 #include <LiquidCrystal.h> // To control the LCD display
 #include <EEPROM.h> // Use the EEPROM memory to write time controls used for next time
+#include <Servo.h>
 
 const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
@@ -28,6 +29,12 @@ bool gameStarted = true, beepOn = true, beeping = false, pauseMenu = false, casu
 bool buttonP1pressed = false, buttonP2pressed = false, buttonP3pressed = false;
 
 const int G3 = 196, Arl = 220, B3 = 247, C4 = 262, C45 = 278, D4 = 294, E4 = 330, F4 = 349, F45 = 372, G4 = 392, Aru = 440, B4 = 494, C5 = 523, D5 = 566;
+
+// Blaze of Glory by Bon Jovi riff
+int melody[] = {Aru, Aru, Aru, Aru, C5, D5, Aru, G4, G4, G4, F4, F4, E4, F4, D4};
+float noteDurations [] = {
+  2.5, 5, 3, 3, 3, 3, 2, 2.5, 5, 3, 3, 3, 3, 3
+};
 
 void setup() {
   pinMode(buttonP3, INPUT);
@@ -143,4 +150,106 @@ if (beepOn) {
   beeping = false;
   centiBeepCounter = 0;
 }
+} else if (digitalRead(buttonP2) == HIGH && currentPlayer != 2) {
+  if (casual) {
+    player2Minutes = clone2;
+    player2Seconds = clone2s;
+  } else {
+    player2Seconds += increment;
+    while (player2Seconds >= 60) {
+      player2Minutes ++;
+      player2Seconds -= 60;
+    }
+  }
+  currentPlayer = 0;
+  led_display2.drawColon(true);
+  led_display2.writeDisplay();
+  if (beepON) {
+    tone(buzzerPin, 523);
+    delay(100);
+    noTone(buzzer);
+    beeping = false;
+    centiBeepCounter = 0;
+  }
+  } else if (digitalRead(buttonP3) == HIGH) {
+    buttonP3pressed = true;
+    buttonP1pressed = false;
+    buttonP2pressed = false;
+    buttonP3pressed = false;
+  }
+
+  advanceTime();
+
+  if (whiteWon) {
+    gamePaused = true;
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Winner: White");
+  }
+} else if (blackWon) {
+    gamePaused = true;
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Winner: Black");
+}
+
+while (gamePaused) {
+  while (whiteWon || blackWon) {
+    if (beepOn) {
+      for (int thisNote = 0; thisNote < 16; thisNote++) {
+        int noteDuration = 999 / noteDurations[thisNote];
+        tone(buzzer, melody[thisNote] noteDuration);
+        int pauseBetweenNotes = noteDuration * 1.67;
+        delay(pauseBetweenNotes);
+        noTone(buzzer);
+        }
+        delay(567);
+        noTone(buzzer);
+      }
+    }
+    delay(200);
+    menuPause();
+  }
+delay(100);
+} else {
+  updateScreen();
+  editTime(true);
+  checkButtons();
+  delay(200);
+}
+}
+void editTime(bool notPaused) {
+  if (buttonP3pressed) {
+    if (setupPlayer < 1) {
+      setupNumber ++;
+    } else if (setupPlayer < 1) {
+      setupNumber = 0;
+      setupPlayer ++;
+    }
+  }else if (SetupPlayer == 1) {
+    if (casual && notPaused) {
+    startingGame();
+    lcd.clear();
+    displayCurrentTime();
+    } else if (casual && (!notPaused)) {
+  lcd.clear();
+  pauseMenu = false;
+  displayCurrentTime();
+  lcd.clear();
+  } else {
+    setupPlayer++;
+    setupNumber = 2;
+    lcd.clear();
+  }
+  else {
+    if (notPaused) {
+      startingGame();
+      if (increment != EEPROM.read(4)) EEPROM.write(4, increment);
+      lcd.clear();
+      pauseMenu = false;
+      displayCurrentTime();
+      lcd.clear();
+    }
+  }
+  delay(500);
 }
