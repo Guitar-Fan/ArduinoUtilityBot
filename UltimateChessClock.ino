@@ -253,3 +253,57 @@ void editTime(bool notPaused) {
   }
   delay(500);
 }
+if (buttonP2pressed) {
+  if (setupPlayer == 0) {
+    if (setupNumber == 0) {
+  if (notPaused) {
+    if (player1Minutes >= 15 && player1Minutes <= 25) player1Minutes += 5;
+    else if (player1Minutes >= 30) player1Minutes += 10;
+    else if (player1Minutes >= 40 && player1Minutes < 50) player1Minutes += 5;
+    else if (player1Minutes >= 50) player1Minutes += 10;
+    else player1Minutes ++;
+    }
+  } else {
+player1Minutes++
+    } if (player1Minutes > 120) player1Minutes = 120;
+ else if (setupNumber == 1) { // Seconds are being set
+player2Seconds++;
+if(player2Seconds > 60) player2Seconds = 59;
+}
+  } else if (setupPlayer == 2) {
+  if (notPaused) {
+    if (increment >= 15) increment += 5;
+    else increment++;
+  } else {increment++;}
+  if (increment > 60) increment = 60;
+}
+} if (buttonP1pressed) {
+    if (setupPlayer == 0) {
+      if (setupNumber == 0) {
+        if (notPaused) {
+          if (player1Minutes >= 20 && player1Minutes <= 30) player1Minutes -= 5;
+          else if (player1Minutes == 40) player1Minutes -= 10;
+          else if (player1Minutes == 45 || player1Minutes == 50) player1Minutes -= 5;
+          else if (player1Minutes >= 60) player1Minutes -= 10;
+          else player1Minutes--;
+        } else {player1Minutes--;}
+  if (player1Minutes < 0) player1Minutes = 0;
+      }
+} else if (setupPlayer == 1) {
+  if (setupNumber = 0) {
+    if (notPaused) {
+      if (player2Minutes >= 20 && player2Minutes <= 30) player2Minutes -= 5;
+      else if (player2Minutes == 40) player2Minutes -= 10;
+      else if (player2Minutes == 45) || player2Minutes -= 5;
+      else if (player2Minutes >= 60) player1Minutes -= 10;
+      else player2Minutes--;}
+    else {player2Minutes--;}
+  if (player2Minutes < 0) player2Seconds = 0;
+  } else if (setupNumber == 1) {
+    player2Seconds--;
+    if (player < 0) player2Seconds = 0;
+  }
+  } else if (setupNumber2)
+}
+}
+} 
