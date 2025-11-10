@@ -1,20 +1,24 @@
-#include <Wire.h> // For communicating with the 7-segment displays
+#include <Wire.h> // Core Library
 #include <Adafruit_LEDBackpack.h> // For controlling the 4-digit 7-segment LED displays
 #include <LiquidCrystal.h> // To control the LCD display
-#include <EEPROM.h> // Use the EEPROM memory to write time controls used for next time
-#include <Servo.h>
+#include <EEPROM.h> // EEPROM memory to write time controls used for next time
+#include <Servo.h> // Point at Players turn
 
+// LCD Pins
 const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
+// Adafruit Displays
 Adafruit_7segment led_display1 = Adafruit_7segment();
 Adafruit_7segment led_display2 = Adafruit_7segment();
 
+// Buttons
 const int buttonP3 = 8; // Pause game or move to next setting
 const int buttonP2 = 9; // Player 2 or increase setting
 const int buttonP1 = 10; // Player 1 button or decrease setting
 const int buzzerPin = 7; // Buzzer pin
 
+// Variables for Chess Clock
 int setupPlayer = 0;
 int setupNumber = 0;
 int currentPlayer = 0;
@@ -26,8 +30,10 @@ int centiCounter1 = 0, centiCounter2 = 0; centiBeepCounter = 0;
 int whiteGames = 0, blackGames = 0;
 bool gameStarted = true, beepOn = true, beeping = false, pauseMenu = false, casual = true;
 
+// Button Logic
 bool buttonP1pressed = false, buttonP2pressed = false, buttonP3pressed = false;
 
+// Preset Frequencies For Making COOL Ringtones
 const int G3 = 196, Arl = 220, B3 = 247, C4 = 262, C45 = 278, D4 = 294, E4 = 330, F4 = 349, F45 = 372, G4 = 392, Aru = 440, B4 = 494, C5 = 523, D5 = 566;
 
 // Blaze of Glory by Bon Jovi riff
@@ -36,6 +42,7 @@ float noteDurations [] = {
   2.5, 5, 3, 3, 3, 3, 2, 2.5, 5, 3, 3, 3, 3, 3
 };
 
+// Boring part of coding Arduino
 void setup() {
   pinMode(buttonP3, INPUT);
   pinMode(buttonP2, INPUT);
@@ -49,24 +56,27 @@ void setup() {
 
   lcd.begin(16, 2);
 
+// Narcisist
   lcd.setCursor(0, 0);
   lcd.print(" Ultimate Chess Clock");
   lcd.setCursor(0, 1);
-  lcd.print("  By Sean Tran  ");
+  lcd.print("By: And He Sacks, THE ROOK!!!");
   delay(2000);
 
+  // Prompt to turn Beep off
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print(" Turn beep off? ");
+  lcd.print(" Don't like Square Waves???");
 
   get_ans(beepOn);
-  
+
+// Competitive or Casual Prompt
   delay(200);
   lcd.clear();
   lcd.setCursor(0, 1);
-  lcd.print(Competitive or");
+  lcd.print(Playing Magnus");
   lcd.setCursor(0, 1);
-  lcd.print("Casual?");
+  lcd.print(" or Martin?");
 
   get_ans(casual);
   bool checker2 = true;
@@ -85,6 +95,7 @@ if (!checker2) {
 
   get_ans(checker2);
 
+// Saved Settings are Read
   if (!checker2) {
     if (EEPROM.read(0) != 255) player1Minutes = EEPROM.read(0);
     if (EEPROM.read(1) != 255) player1Seconds = EEPROM.read(1);
@@ -108,6 +119,7 @@ lcd.print("score?);
 checker2 = true;
 get_ans(checker2);
 
+
 if (!checker2) {
   if (EEPROM.read(5) != 255) whiteGames = EEPROM.read(5);
   if (EEPROM.read(6) != 255) blackGames = EEPROM.read(6);
@@ -118,8 +130,10 @@ updateScreen();
 
 }
 
+// Chess Clock must be oriented so White Pieces take Button 1
 void loop() {
   if (gameRunning) {
+    // Start game only when White presses Button
     while (gameRunning) {
       if (digitalRead(buttonP1) == HIGH) {
         gameStarted = false;
@@ -128,6 +142,7 @@ void loop() {
       }
   }
 
+// Button Press Handling
 if (digitalRead(buttonP1) == HIGH && currentPlayer == 1) {
   if (casual) {
 player1Minutes = clone1;
@@ -143,6 +158,7 @@ currentPlayer = 1;
 led_display1.drawColon(true);
 led_display1.writeDisplay();
 
+// Why C5, I don't know
 if (beepOn) {
   tone(buzzerPin, C5);
   delay(100);
@@ -303,7 +319,76 @@ if(player2Seconds > 60) player2Seconds = 59;
     player2Seconds--;
     if (player < 0) player2Seconds = 0;
   }
-  } else if (setupNumber2)
+  } else if (setupNumber2) {
+    if (notPaused) {
+    if (increment >= 20) increment -= 5;
+    else increment--;
+    }
+    else {increment--;}
+} if (increment < 0) increment = 0;
 }
 }
 } 
+
+void updateScreen() {
+  const char* labels[] = {"Minutes: ", "Seconds: ", "Increment: "};
+  const char* player[] = {"Player 1: ", "Player 2: ", "Both: "}
+
+  lcd.setCursor(0, 0);
+  lcd.print(player[setupPlayer]);
+  lcd.setCursor(0, 1);
+  lcd.print(labels[setupNumber]);
+
+  if (setupPlayer == 0) {
+  led_display1.clear();
+  setTime(player1Minutes, true, true);
+  setTime(player1Seconds, true, false);
+  led_display1.printIn(player1Time);
+  led.display1.drawColon(true);
+  led.display1.writeDisplay();
+} else if (setupPlayer == 1) {
+  led_display2.clear();
+  setTime(player2Minutes, false, true);
+  setTime(player2Minutes, false, false);
+  led_display2.printIn(player2Time);
+  led_display2.drawColon(true);
+  led_display2.writeDisplay();
+} else {
+  led_display1.clear();
+  led_display2.clear();
+  led_display1.printIn(increment);
+  led_display1.drawColon(false);
+  led_display2.drawColon(false);
+  led_display1.writeDisplay();
+  led_display2.writeDisplay();
+}
+}
+
+void advanceTime() {
+  if (buttonP3pressed) {
+    gamePaused = true;
+    lcd.clear();
+    return;
+  }
+
+  if (currentPlayer == 0) {
+    if (centiCounter1 < 10) {
+      centicounter++;
+    } else if (player1Seconds > 0) {
+      centiCounter1 = 0;
+      player1Seconds--;
+    } else if (player1Minutes > 0) {
+      centiCounter1 = 0;
+      player1Seconds = 59;
+    } else {
+      blackWon = true;
+      blackGames++;
+      if (whiteGames != EEPROM.read(5)) EEPROM.write(5, whiteGames);
+      if (blackGames != EEPROM.read(6)) EEPROM.write(6, blackGames);   
+    }
+  } else if (currentPlayer == 1) {
+    centiCounter2 = 0;
+    player2Minutes--;
+    player2Seconds = 59;
+  }
+}
