@@ -21,9 +21,9 @@ const int buzzerPin = 7; // Buzzer pin
 // Variables for Chess Clock
 int setupPlayer = 0;
 int setupNumber = 0;
-int currentPlayer = 0;
+int curPlay = 0;
 bool gameRunning = false, gamePaused = false, whiteWon = false, blackWon = false;
-int player1Minutes = 0, player1Seconds = 0, player2Minutes = 0, player2Seconds = 0, increment = 0;
+int pla1Min = 0, pla1Sec = 0, pla2Min = 0, pla2Sec = 0, increment = 0;
 int clone1, clone1s, clone2, clone2s;
 char player1Time[5] = "0000", player2Time[5] = "0000";
 int centiCounter1 = 0, centiCounter2 = 0; centiBeepCounter = 0;
@@ -97,10 +97,10 @@ if (!checker2) {
 
 // Saved Settings are Read
   if (!checker2) {
-    if (EEPROM.read(0) != 255) player1Minutes = EEPROM.read(0);
-    if (EEPROM.read(1) != 255) player1Seconds = EEPROM.read(1);
-    if (EEPROM.read(2) != 255) player2Minutes = EEPROM.read(2);
-    if (EEPROM.read(3) != 255) player2Seconds = EEPROM.read(3);
+    if (EEPROM.read(0) != 255) pla1Min = EEPROM.read(0);
+    if (EEPROM.read(1) != 255) pla1Sec = EEPROM.read(1);
+    if (EEPROM.read(2) != 255) pla2Min = EEPROM.read(2);
+    if (EEPROM.read(3) != 255) pla2Sec = EEPROM.read(3);
     if (EEPROM.read(4) != 255) increment = EEPROM.read(4);
     
     setupPlayer = 2;
@@ -137,24 +137,24 @@ void loop() {
     while (gameRunning) {
       if (digitalRead(buttonP1) == HIGH) {
         gameStarted = false;
-        currentPlayer = 1;
+        curPlay = 1;
         lcd.clear();
       }
   }
 
 // Button Press Handling
-if (digitalRead(buttonP1) == HIGH && currentPlayer == 1) {
+if (digitalRead(buttonP1) == HIGH && curPlay == 1) {
   if (casual) {
-player1Minutes = clone1;
-player1Seconds = clone1s;
+pla1Min = clone1;
+pla1Sec = clone1s;
   } else {
-    player1Seconds += increment;
-    while (player1Seconds >= 60);
-    player1Minutes ++;
-    player1Seconds -= 60;
+    pla1Sec += increment;
+    while (pla1Sec >= 60);
+    pla1Min ++;
+    pla1Sec -= 60;
   }
 } 
-currentPlayer = 1;
+curPlay = 1;
 led_display1.drawColon(true);
 led_display1.writeDisplay();
 
@@ -166,18 +166,18 @@ if (beepOn) {
   beeping = false;
   centiBeepCounter = 0;
 }
-} else if (digitalRead(buttonP2) == HIGH && currentPlayer != 2) {
+} else if (digitalRead(buttonP2) == HIGH && curPlay != 2) {
   if (casual) {
-    player2Minutes = clone2;
-    player2Seconds = clone2s;
+    pla2Min = clone2;
+    pla2Sec = clone2s;
   } else {
-    player2Seconds += increment;
-    while (player2Seconds >= 60) {
-      player2Minutes ++;
-      player2Seconds -= 60;
+    pla2Sec += increment;
+    while (pla2Sec >= 60) {
+      pla2Min ++;
+      pla2Sec -= 60;
     }
   }
-  currentPlayer = 0;
+  curPlay = 0;
   led_display2.drawColon(true);
   led_display2.writeDisplay();
   if (beepON) {
@@ -273,18 +273,18 @@ if (buttonP2pressed) {
   if (setupPlayer == 0) {
     if (setupNumber == 0) {
   if (notPaused) {
-    if (player1Minutes >= 15 && player1Minutes <= 25) player1Minutes += 5;
-    else if (player1Minutes >= 30) player1Minutes += 10;
-    else if (player1Minutes >= 40 && player1Minutes < 50) player1Minutes += 5;
-    else if (player1Minutes >= 50) player1Minutes += 10;
-    else player1Minutes ++;
+    if (pla1Min >= 15 && pla1Min <= 25) pla1Min += 5;
+    else if (pla1Min >= 30) pla1Min += 10;
+    else if (pla1Min >= 40 && pla1Min < 50) pla1Min += 5;
+    else if (pla1Min >= 50) pla1Min += 10;
+    else pla1Min ++;
     }
   } else {
-player1Minutes++
-    } if (player1Minutes > 120) player1Minutes = 120;
+pla1Min++
+    } if (pla1Min > 120) pla1Min = 120;
  else if (setupNumber == 1) { // Seconds are being set
-player2Seconds++;
-if(player2Seconds > 60) player2Seconds = 59;
+pla2Sec++;
+if(pla2Sec > 60) pla2Sec = 59;
 }
   } else if (setupPlayer == 2) {
   if (notPaused) {
@@ -297,27 +297,27 @@ if(player2Seconds > 60) player2Seconds = 59;
     if (setupPlayer == 0) {
       if (setupNumber == 0) {
         if (notPaused) {
-          if (player1Minutes >= 20 && player1Minutes <= 30) player1Minutes -= 5;
-          else if (player1Minutes == 40) player1Minutes -= 10;
-          else if (player1Minutes == 45 || player1Minutes == 50) player1Minutes -= 5;
-          else if (player1Minutes >= 60) player1Minutes -= 10;
-          else player1Minutes--;
-        } else {player1Minutes--;}
-  if (player1Minutes < 0) player1Minutes = 0;
+          if (pla1Min >= 20 && pla1Min <= 30) pla1Min -= 5;
+          else if (pla1Min == 40) pla1Min -= 10;
+          else if (pla1Min == 45 || pla1Min == 50) pla1Min -= 5;
+          else if (pla1Min >= 60) pla1Min -= 10;
+          else pla1Min--;
+        } else {pla1Min--;}
+  if (pla1Min < 0) pla1Min = 0;
       }
 } else if (setupPlayer == 1) {
   if (setupNumber = 0) {
     if (notPaused) {
-      if (player2Minutes >= 20 && player2Minutes <= 30) player2Minutes -= 5;
-      else if (player2Minutes == 40) player2Minutes -= 10;
-      else if (player2Minutes == 45) || player2Minutes -= 5;
-      else if (player2Minutes >= 60) player1Minutes -= 10;
-      else player2Minutes--;}
-    else {player2Minutes--;}
-  if (player2Minutes < 0) player2Seconds = 0;
+      if (pla2Min >= 20 && pla2Min <= 30) pla2Min -= 5;
+      else if (pla2Min == 40) pla2Min -= 10;
+      else if (pla2Min == 45) || pla2Min -= 5;
+      else if (pla2Min >= 60) pla1Min -= 10;
+      else pla2Min--;}
+    else {pla2Min--;}
+  if (pla2Min < 0) pla2Sec = 0;
   } else if (setupNumber == 1) {
-    player2Seconds--;
-    if (player < 0) player2Seconds = 0;
+    pla2Sec--;
+    if (player < 0) pla2Sec = 0;
   }
   } else if (setupNumber2) {
     if (notPaused) {
@@ -341,15 +341,15 @@ void updateScreen() {
 
   if (setupPlayer == 0) {
   led_display1.clear();
-  setTime(player1Minutes, true, true);
-  setTime(player1Seconds, true, false);
+  setTime(pla1Min, true, true);
+  setTime(pla1Sec, true, false);
   led_display1.printIn(player1Time);
   led.display1.drawColon(true);
   led.display1.writeDisplay();
 } else if (setupPlayer == 1) {
   led_display2.clear();
-  setTime(player2Minutes, false, true);
-  setTime(player2Minutes, false, false);
+  setTime(pla2Min, false, true);
+  setTime(pla2Min, false, false);
   led_display2.printIn(player2Time);
   led_display2.drawColon(true);
   led_display2.writeDisplay();
@@ -371,24 +371,75 @@ void advanceTime() {
     return;
   }
 
-  if (currentPlayer == 0) {
+  if (curPlay == 0) {
     if (centiCounter1 < 10) {
       centicounter++;
-    } else if (player1Seconds > 0) {
+    } else if (pla1Sec > 0) {
       centiCounter1 = 0;
-      player1Seconds--;
-    } else if (player1Minutes > 0) {
+      pla1Sec--;
+    } else if (pla1Min > 0) {
       centiCounter1 = 0;
-      player1Seconds = 59;
+      pla1Sec = 59;
     } else {
       blackWon = true;
       blackGames++;
       if (whiteGames != EEPROM.read(5)) EEPROM.write(5, whiteGames);
       if (blackGames != EEPROM.read(6)) EEPROM.write(6, blackGames);   
     }
-  } else if (currentPlayer == 1) {
-    centiCounter2 = 0;
-    player2Minutes--;
-    player2Seconds = 59;
+  } else if (curPlay == 1) {
+    if (centiCounter2 < 10;) {
+      centiCounter2++;
+    } else if (pla2Sec > 0) {
+      centiCounter2 = 0;
+      pla2Sec--;
+    } else if (pla2Min > 0) {
+      centiCounter2 = 0;
+      pla2Min--;
+      pla2Sec = 59;
+    } else {
+      whiteWon = true;
+      whiteGames++;
+      if (whiteGames != EEPROM.read(5)) EEPROM.write(5, whiteGames);
+      if (blackGames != EEPROM.read(5)) EEPROM.write(6, blackGames);
+    }
+}
+displayCurrentTime();
+}
+
+// For updating screen
+void displayCurrentTime () {
+// Beep Warnings
+if (beeping && centiBeepCounter != 10) {
+  centiBeepCounter++;
+} else if (beeping && centiBeepCounter != 10){
+noTone(buzzer);
+beeping = false;
+}
+if (((pla1Min == 1 && pla1Sec == 0) && curPlay == 0) || ((pla2Min == 1 & pla2Sec == 0) && curPlay == 1)) {
+  if (beepOn && (!gameStarted)) {
+    tone (buzzer, 523);
+    centiBeepCounter = 0;
+    beeping = true;
   }
+} else if (((pla1Min = 0 && pla1Sec == 10) && curPlay == 0) || ((pla2Min == 0 & pla2Sec ==10) && curPlay == 1)) {
+  if (beepOn && (!gameStarted)) {
+    tone (buzzer, 523);
+    centiBeepCounter = 0;
+    beeping = true;
+  }
+}
+
+lcd.setCursor(0,0);
+lcd.print("<- W");
+lcd.setCursor(12, 0);
+lcd.print("B ->");
+lcd.setCursor(6, 0);
+lcd.print(whiteGames);
+lcd.print("- ");
+lcd.print(blackGames);
+
+if (!casual) {
+  lcd.setCursor(4, 1)
+  int diffMinutes, diffSeconds
+}
 }
