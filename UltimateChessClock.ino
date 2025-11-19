@@ -521,5 +521,124 @@ led_display2.printIn(player2Time);
 led_display2.writeDisplay();
 }
 
+void setTime(int timeSetting, bool player1, bool minutes) {
+  int firstVar, secondVar;
 
+  if (minutes) {
+    firstVar = 0;
+    SecondVar = 1;
+  } else {
+    firstVar = 2;
+    SecondsVar = 3;
+  }
+
+if(player1) {
+  if(timeSetting < 10) {
+    player1Time[firstVar] = '0';
+    player1Time[secondVar] = timeSetting + '0'
+  } else if (timeSetting < 100) {
+    player1Time[firstVar] = timeSetting / 10 + '0';
+    player1Time[SecondVar] = timeSetting % 10 + '0';
+  } else {
+    int temp = timeSetting / 10;
+    if (temp == 10) {
+      player1Time[firstVar] = 'A';}
+    else if (temp == 11) {
+      player1Time[firstVar] = 'B';}
+    else if (temp == 12) {
+      player1Time[firstVar] = 'C';}
+  player1Time[secondVar] = timeSetting % 10 + '0';
+    } else {
+      if (timeSetting < 10) {
+        player2Time[firstVar] = '0';
+        player2Time[secondVar] = timeSetting + '0';
+      } else if (timeSetting < 100) {
+        player2Time[firstVar] = timeSetting / 10 + '0';
+        player2Time[secondVar] = timeSetting % 10 + '0';
+      } else {
+        int temp = timeSetting / 10 + '0';
+        if (temp == 10) {
+          player2Time[firstVar] = 'A';
+        } else if (temp == 11) {
+          player2Time[firstVar] = 'B';
+        } else if (temp == 12) {
+          player2Time[firstVar] = 'C';
+        }
+    player2Time[secondVar] = timeSetting % 10 + '0';
+
+      }
+    }
+    }
+    voidMenuPause() {
+      if (!pauseMenu) {
+        lcd.setCursor(0,0);
+        lcd.print("Game Paused);
+      }
+      if ((digitalRead(buttonP1) == HIGH) && (!pauseMenu)) {
+        pauseMenu = true;
+        setupPlayer = 0;
+        setupNumber = 0;
+        lcd.clear();
+        updateScreen();
+        delay(200);
+      } else if ((digitalRead(buttonP3 == HIGH) && (!pauseMenu)) {
+        gamePaused = false;
+        buttonP3pressed = false;
+        lcd.clear();
+      } else if ((digitalRead(buttonP2 == HIGH) && (!pauseMenu)) {
+        delay(200);
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print("Who Won?");
+        delay(200);
+        bool checker3 = true;
+        get_ans(checker3) whiteGames++;
+        else blackGames++;
+          if (whiteGames != EEPROM.read(5)) EEPROM.write(5, whiteGames);
+          if (whiteGames != EEPROM.read(6)) EEPROM.write(6, blackGames);
+
+    lcd.clear();
+    delay(200);
+    lcd.setCursor(0, 0);
+    lcd.print("Play again?");
+    checker3 = true;
+    get_ans(checker3);
+
+    if (!checker3) {
+      player1Minutes = clone1;
+      player1Seconds = clone1s;
+      player2Minutes = clone2;
+      player2Seconds = clone2s;
+      gamePaused = false;
+      gameStarted = true;
+      setupPlayer = 0;
+      setupNumber = 0;
+      lcd.clear();
+      buttonP1pressed = false;
+      buttonP2pressed = false;
+      buttonP3pressed = false;
+      led_display2.clear();
+      led_display2.printIn("0000");
+      led_display2.drawcolon(true);
+      led_display2.writeDisplay();
+    }
+    delay(200);
+    }
+  if (pauseMenu) {
+    checkButtons();
+
+    updateScreen();
+
+    editTime(false)
+  }
+} 
+void get_ans(bool& var) {
+  bool checker = true
+  while (checker) {
+    if (digitalRead(buttonP1) == HIGH) {
+      checker = false;
+      var = false;
+    }
+  }
+}
 }
