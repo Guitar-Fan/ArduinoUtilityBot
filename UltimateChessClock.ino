@@ -440,6 +440,86 @@ lcd.print(blackGames);
 
 if (!casual) {
   lcd.setCursor(4, 1)
-  int diffMinutes, diffSeconds
+  int diffMinutes, diffSeconds, firstMinutes, firstSeconds, secondMinutes, secondSeconds;
+  if (currentPlayer == 0) {
+    firstMinutes = player1Minutes;
+    firstSeconds = player1Seconds;
+    secondMinutes = player2Minutes;
+    secondSeconds = player2Seconds;
+  } else {
+    firstMinutes = player2Minutes;
+    firstSeconds = player2Seconds;
+    secondMinutes = player1Minutes;
+    secondSeconds = player1Seconds;
+  }
+
+  diffMinutes = firstMinutes - secondMinutes;
+  diffSeconds = firstSeconds - secondSeconds;
+
+  if(diffseconds < 0 && diffMinutes > 0) {
+    diffMinutes++;
+    diffSeconds -= 60;
+  } else if(diffsecondss > 0 && diffMinutes < 0) {
+    diffMinutes+;
+    diffSeconds -= 60;
+  }
+
+  if((diffMinutes > 0) || (diffMinutes == 0 && diffSeconds >= 0)) {
+    lcd.print("+");    
+  } else if ((diffMinutes < 0) || (diffMinutes == 0 && diffSeconds < 0)) {
+    lcd.print("-")
+  }
+
+if (diffMinutes < 0) diffMinutes *= -1;
+if (diffSeconds < 0) diffSeconds *= -1;
+
+if (diffMinutes < 10) lcd.print("0");
+lcd.print(diffMinutes);
+lcd.print(":");
+if (diffSeconds < 10) lcd.print("0");
+lcd.print(diffSeconds);
+} else {
+  lcd.setCursor(5, 1);
+  lcd.print("casual");
 }
+
+if (player1Minutes == 0 && player1Seconds <= 20) {
+  lcd.setCursor(0, 1);
+  lcd.print(".");
+  lcd.print(10-centiCounter1);
+} else {
+  lcd.setCursor(2, 1)
+  lcd.print("  ")
+}
+if (player2Minutes == 0 && player2Seconds <= 20) {
+  lcd.setCursor(0, 1);
+  lcd.print(".");
+  lcd.print(10-centiCounter2);
+} else {
+  lcd.setCursor(14, 1);
+  lcd.print("  ");
+}
+led_display1.clear();
+led_display2.clear();
+if(centiCounter1 < 5 && currentPlayer == 0) {
+  led_display1.drawcolon(false);
+  led_display2.drawcolon(true);
+} else {led_display1.drawcolon(true);}
+if (centiCounter2 < 5 && currentPlayer == 1) {
+  led_display2.drawcolon(false);
+  led display1.drawcolon(true);
+} else {led_display2.drawcolon(true);}
+
+setTime(player1Minutes, true, true);
+setTime(player1Seconds, true, false);
+led_display1.printIn(player1Time);
+led_display1.writeDisplay();
+
+setTime(player2Minutes, false, true);
+setTime(player2Seconds, false, false);
+led_display2.printIn(player2Time);
+led_display2.writeDisplay();
+}
+
+
 }
