@@ -633,12 +633,55 @@ if(player1) {
   }
 } 
 void get_ans(bool& var) {
-  bool checker = true
+  bool checker = true;
   while (checker) {
     if (digitalRead(buttonP1) == HIGH) {
       checker = false;
       var = false;
+    } else if (digitalRead(buttonP2) == HIGH) {
+      checker = false;
     }
   }
+}
+
+void checkButtons() {
+  if (digitalRead(buttonP1) == HIGH) {
+    buttonP1pressed = true;
+    buttonP2pressed = false;
+    buttonP3pressed = false;
+  } else if (digitalRead(buttonP2) == HIGH) {
+    buttonP1pressed = false;
+    buttonP2pressed = true;
+    buttonP3pressed = false;
+  } else if (digitalRead(buttonP3) == HIGH) {
+    buttonP1pressed = false;
+    buttonP2pressed = false;
+    buttonP3pressed = true;
+  } else {
+    buttonP1pressed = false;
+    buttonP2pressed = false;
+    buttonP3pressed = false;
+  }
+}
+
+void startingGame() {
+  gameRunning = true;
+  if(player1Minutes == 0 && player1Seconds==0) {
+    player1Minutes = 10;
+} if (player2Minutes == 0 && player2Seconds == 0) {
+  player2Minutes = player1Minutes;
+  player2Seconds = player1Seconds;
+}
+
+clone1 = player1Minutes;
+clone1s = player1Seconds;
+clone2 = player2Minutes;
+clone2s = player2Seconds;
+
+  // Write Variables to Memory
+if (player1Minutes != EEPROM.read(0)) EEPROM.write(0, player1Minutes);
+if (player1Seconds != EEPROM.read(1)) EEPROM.write(1, player1Seconds);
+if (player2Minutes != EEPROM.read(2)) EEPROM.write(2, player2Minutes);
+if (player2Seconds != EEPROM.read(3)) EEPROM.write(3, player2Seconds);
 }
 }

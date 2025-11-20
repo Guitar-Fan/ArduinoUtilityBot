@@ -3,7 +3,7 @@
   "author": "Sean Tran",
   "editor": "wokwi",
   "parts": [
-    { "type": "wokwi-arduino-uno", "id": "uno", "top": 0, "left": 0, "attrs": {} },
+    { "type": "wokwi-arduino-uno", "id": "uno", "top": -37.8, "left": 9, "attrs": {} },
     {
       "type": "wokwi-tm1637-7segment",
       "id": "sevseg1",
@@ -24,21 +24,21 @@
       "id": "btn1",
       "top": 179,
       "left": 316.8,
-      "attrs": { "color": "green", "xray": "1" }
+      "attrs": { "color": "green", "xray": "1", "bounce": "0" }
     },
     {
       "type": "wokwi-pushbutton",
       "id": "btn2",
       "top": 179,
       "left": 412.8,
-      "attrs": { "color": "green", "xray": "1" }
+      "attrs": { "color": "green", "xray": "1", "bounce": "0" }
     },
     {
       "type": "wokwi-pushbutton",
       "id": "btn3",
       "top": 179,
       "left": 499.2,
-      "attrs": { "color": "green", "xray": "1" }
+      "attrs": { "color": "green", "xray": "1", "bounce": "0" }
     },
     {
       "type": "wokwi-pushbutton",
@@ -85,18 +85,18 @@
     }
   ],
   "connections": [
-    [ "lcd1:VSS", "uno:GND.2", "green", [ "v-144", "h153.6" ] ],
+    [ "lcd1:VSS", "uno:GND.3", "green", [ "v-144", "h153.6" ] ],
     [ "lcd1:VDD", "uno:5V", "green", [ "v-134.4", "h124.9" ] ],
     [ "lcd1:V0", "pot1:SIG", "green", [ "v134.4", "h47.7" ] ],
-    [ "pot1:VCC", "uno:3.3V", "red", [ "v-86.4", "h-125.6", "v-172.8", "h201.6" ] ],
-    [ "pot1:GND", "uno:GND.3", "black", [ "v19.2", "h201.6", "v-278.4", "h-105.6" ] ],
+    [ "pot1:VCC", "uno:5V", "red", [ "v-86.4", "h-125.6", "v-172.8", "h201.6" ] ],
+    [ "pot1:GND", "uno:GND.2", "black", [ "v19.2", "h201.6", "v-278.4", "h-105.6" ] ],
     [ "lcd1:RS", "uno:12", "green", [ "v-19.2", "h29.1", "v-355.2", "h48" ] ],
-    [ "lcd1:RW", "uno:GND.2", "green", [ "v-19.2", "h115.1" ] ],
+    [ "lcd1:RW", "uno:GND.3", "green", [ "v-19.2", "h115.1" ] ],
     [ "lcd1:E", "uno:11", "green", [ "v-278.4", "h38.4" ] ],
-    [ "lcd1:D4", "uno:4", "green", [ "v-249.6", "h105.6", "v-28.8" ] ],
-    [ "lcd1:D5", "uno:3", "green", [ "v-153.6", "h-19.1", "v-76.8", "h124.8", "v-19.2" ] ],
-    [ "lcd1:D6", "uno:2", "green", [ "v19.2", "h144.2", "v-384", "h-38.4" ] ],
-    [ "lcd1:D7", "uno:1", "green", [ "v28.8", "h144.3", "v-403.2", "h-48" ] ],
+    [ "lcd1:D4", "uno:5", "green", [ "v-249.6", "h105.6", "v-134.4", "h5.7" ] ],
+    [ "lcd1:D5", "uno:4", "green", [ "v-153.6", "h-19.1", "v-76.8", "h124.8", "v-19.2" ] ],
+    [ "lcd1:D6", "uno:3", "green", [ "v19.2", "h144.2", "v-384", "h-38.4" ] ],
+    [ "lcd1:D7", "uno:2", "green", [ "v28.8", "h144.3", "v-403.2", "h-48" ] ],
     [ "r4:2", "uno:GND.3", "green", [ "v-134.4", "h-49.2" ] ],
     [ "lcd1:A", "uno:5V", "green", [ "v0" ] ],
     [ "sevseg2:CLK", "uno:A4", "green", [ "h0", "v-134.4", "h-297.6" ] ],
@@ -105,7 +105,7 @@
     [ "sevseg2:GND", "uno:GND.3", "black", [ "h-230.4", "v-105.6", "h-134.4" ] ],
     [ "sevseg1:CLK", "uno:A4", "green", [ "h0" ] ],
     [ "sevseg1:DIO", "uno:A5", "green", [ "h0" ] ],
-    [ "sevseg1:VCC", "uno:5V", "red", [ "h0" ] ],
+    [ "sevseg1:VCC", "uno:5V", "blue", [ "h0" ] ],
     [ "sevseg1:GND", "uno:GND.3", "black", [ "h0" ] ],
     [ "bz1:2", "uno:7", "green", [ "v0", "h76.4" ] ],
     [ "bz1:1", "uno:GND.1", "green", [ "v0" ] ],
@@ -113,16 +113,16 @@
     [ "btn4:1.r", "uno:GND.3", "green", [ "v0" ] ],
     [ "btn1:1.l", "uno:5V", "green", [ "h-9.6", "v-19.2", "h-144" ] ],
     [ "btn2:1.l", "uno:5V", "green", [ "h0", "v-28.8", "h-249.6" ] ],
-    [ "btn3:1.l", "uno:5V", "green", [ "h-28.8", "v-48", "h-326.4" ] ],
+    [ "btn3:1.l", "uno:5V", "gold", [ "h-28.8", "v-48", "h-326.4" ] ],
     [ "btn1:2.l", "r2:1", "green", [ "h0" ] ],
     [ "btn2:2.l", "r3:1", "green", [ "h0" ] ],
-    [ "btn3:2.l", "r1:2", "green", [ "h0" ] ],
+    [ "btn3:2.l", "r1:2", "magenta", [ "h0" ] ],
     [ "r2:2", "uno:GND.3", "green", [ "v0", "h-222" ] ],
-    [ "r3:2", "uno:GND.2", "green", [ "v9.6", "h-1.2" ] ],
-    [ "r1:1", "uno:GND.3", "green", [ "v19.2", "h-19.2" ] ],
+    [ "r3:2", "uno:GND.3", "green", [ "v9.6", "h-1.2" ] ],
+    [ "r1:1", "uno:GND.2", "orange", [ "v19.2", "h-19.2" ] ],
     [ "btn1:2.r", "uno:10", "green", [ "h-230.2", "v-163" ] ],
-    [ "btn2:2.l", "uno:9", "green", [ "h0" ] ],
-    [ "btn3:2.l", "uno:8", "green", [ "h0" ] ]
+    [ "btn2:2.r", "uno:9", "orange", [ "h0" ] ],
+    [ "btn3:2.r", "uno:8", "red", [ "h0" ] ]
   ],
   "dependencies": {}
 }
