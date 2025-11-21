@@ -24,21 +24,21 @@
       "id": "btn1",
       "top": 179,
       "left": 316.8,
-      "attrs": { "color": "green", "xray": "1", "bounce": "0" }
+      "attrs": { "color": "green", "xray": "1" }
     },
     {
       "type": "wokwi-pushbutton",
       "id": "btn2",
       "top": 179,
       "left": 412.8,
-      "attrs": { "color": "green", "xray": "1", "bounce": "0" }
+      "attrs": { "color": "green", "xray": "1" }
     },
     {
       "type": "wokwi-pushbutton",
       "id": "btn3",
       "top": 179,
       "left": 499.2,
-      "attrs": { "color": "green", "xray": "1", "bounce": "0" }
+      "attrs": { "color": "green", "xray": "1" }
     },
     {
       "type": "wokwi-pushbutton",
@@ -103,8 +103,8 @@
     [ "sevseg2:DIO", "uno:A5", "green", [ "h9.6", "v-134.4", "h-297.6" ] ],
     [ "sevseg2:VCC", "uno:5V", "red", [ "h-240", "v-86.4", "h-163.2" ] ],
     [ "sevseg2:GND", "uno:GND.3", "black", [ "h-230.4", "v-105.6", "h-134.4" ] ],
-    [ "sevseg1:CLK", "uno:A4", "green", [ "h0" ] ],
-    [ "sevseg1:DIO", "uno:A5", "green", [ "h0" ] ],
+    [ "sevseg1:CLK", "uno:A4", "gold", [ "h0" ] ],
+    [ "sevseg1:DIO", "uno:A5", "purple", [ "h0" ] ],
     [ "sevseg1:VCC", "uno:5V", "blue", [ "h0" ] ],
     [ "sevseg1:GND", "uno:GND.3", "black", [ "h0" ] ],
     [ "bz1:2", "uno:7", "green", [ "v0", "h76.4" ] ],
@@ -113,16 +113,16 @@
     [ "btn4:1.r", "uno:GND.3", "green", [ "v0" ] ],
     [ "btn1:1.l", "uno:5V", "green", [ "h-9.6", "v-19.2", "h-144" ] ],
     [ "btn2:1.l", "uno:5V", "green", [ "h0", "v-28.8", "h-249.6" ] ],
-    [ "btn3:1.l", "uno:5V", "gold", [ "h-28.8", "v-48", "h-326.4" ] ],
+    [ "btn3:1.l", "uno:5V", "green", [ "h-28.8", "v-48", "h-326.4" ] ],
     [ "btn1:2.l", "r2:1", "green", [ "h0" ] ],
     [ "btn2:2.l", "r3:1", "green", [ "h0" ] ],
-    [ "btn3:2.l", "r1:2", "magenta", [ "h0" ] ],
+    [ "btn3:2.l", "r1:2", "green", [ "h0" ] ],
     [ "r2:2", "uno:GND.3", "green", [ "v0", "h-222" ] ],
     [ "r3:2", "uno:GND.3", "green", [ "v9.6", "h-1.2" ] ],
     [ "r1:1", "uno:GND.2", "orange", [ "v19.2", "h-19.2" ] ],
     [ "btn1:2.r", "uno:10", "green", [ "h-230.2", "v-163" ] ],
-    [ "btn2:2.r", "uno:9", "orange", [ "h0" ] ],
-    [ "btn3:2.r", "uno:8", "red", [ "h0" ] ]
+    [ "btn2:2.l", "uno:9", "green", [ "h0" ] ],
+    [ "btn3:2.l", "uno:8", "green", [ "h0" ] ]
   ],
   "dependencies": {}
 }
